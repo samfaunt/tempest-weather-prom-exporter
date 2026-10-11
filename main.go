@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -28,12 +29,28 @@ func main() {
 		os.Exit(2)
 	}
 	staleAfter := flag.Duration("stale-after", staleDefault, "drop a device's metrics after this long without packets (env TEMPEST_STALE_AFTER)")
+	var elevation *float64
+	setElevation := func(s string) error {
+		v, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return err
+		}
+		elevation = &v
+		return nil
+	}
+	if v := os.Getenv("TEMPEST_ELEVATION"); v != "" {
+		if err := setElevation(v); err != nil {
+			slog.Error("invalid TEMPEST_ELEVATION", "err", err)
+			os.Exit(2)
+		}
+	}
+	flag.Func("elevation", "station elevation in meters; enables sea-level pressure (env TEMPEST_ELEVATION)", setElevation)
 	flag.Parse()
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	collector := NewCollector(*staleAfter)
+	collector := NewCollector(*staleAfter, elevation)
 	prometheus.MustRegister(collector)
 
 	conn, err := listenUDP(ctx, *udpAddr)
@@ -65,6 +82,9 @@ func main() {
 	}()
 
 	slog.Info("listening", "http", *listenAddr, "udp", *udpAddr, "stale_after", *staleAfter)
+	if elevation != nil {
+		slog.Info("sea-level pressure enabled", "elevation_m", *elevation)
+	}
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("http server", "err", err)
 		os.Exit(1)

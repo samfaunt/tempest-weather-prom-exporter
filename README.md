@@ -37,6 +37,7 @@ other listeners such as Home Assistant.
 | `--listen-address` | `TEMPEST_LISTEN_ADDRESS` | `:7070` | HTTP address for `/metrics` |
 | `--udp-address` | `TEMPEST_UDP_ADDRESS` | `:50222` | UDP address for hub broadcasts |
 | `--stale-after` | `TEMPEST_STALE_AFTER` | `5m` | Drop a device's or hub's metrics after this long without packets |
+| `--elevation` | `TEMPEST_ELEVATION` | unset | Station elevation in meters; enables sea-level pressure. Applies to every station the exporter sees |
 
 ## Prometheus
 
@@ -61,6 +62,10 @@ except rain, which stays in millimeters.
   `tempest_precipitation_type{type}`, `tempest_rain_day_millimeters` (SKY only),
   `tempest_lightning_strike_avg_distance_meters`,
   `tempest_last_observation_timestamp_seconds`.
+- Derived from observations: `tempest_feels_like_celsius` (NWS heat index at
+  or above 26.7 °C, NWS wind chill at or below 10 °C with wind above 4.8 km/h,
+  otherwise air temperature) and `tempest_sea_level_pressure_pascals`
+  (standard-atmosphere reduction, only when `--elevation` is set).
 - Counters built from observations: `tempest_rain_millimeters_total`,
   `tempest_lightning_strikes_total`. Repeated observations (same or older
   timestamp) are ignored, so they are never counted twice. They reset when the
@@ -77,8 +82,7 @@ except rain, which stays in millimeters.
   `tempest_hub_info{firmware,reset_flags}`.
 - Exporter: `tempest_udp_packets_total{type}`, `tempest_udp_decode_errors_total{type}`.
 
-Dew point, feels-like and sea-level pressure are not computed; derive them with
-recording rules or in Grafana.
+Dew point is computed in the Grafana dashboard from temperature and humidity.
 
 ## Grafana
 
@@ -90,8 +94,8 @@ import form asks for:
   the default `.+` shows all stations.
 
 Both are fixed at import; re-import to change them. The dashboard has current
-conditions, temperature and dew point, humidity, pressure and 3h pressure
-change, wind, rain, sun, lightning, and a collapsed device health row
+conditions, temperature with feels-like and dew point, humidity, station and sea-level
+pressure, 3h pressure change, wind, rain, sun, lightning, and a collapsed device health row
 (battery, signal, uptime, sensor flags, exporter packet rate).
 
 ### PromQL recipes

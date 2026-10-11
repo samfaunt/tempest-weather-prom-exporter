@@ -15,7 +15,7 @@ import (
 func newTestCollector(t *testing.T) (*Collector, *time.Time) {
 	t.Helper()
 	now := time.Unix(1_700_000_000, 0)
-	c := NewCollector(5 * time.Minute)
+	c := NewCollector(5*time.Minute, nil)
 	c.now = func() time.Time { return now }
 	return c, &now
 }
@@ -259,6 +259,29 @@ tempest_udp_packets_total{type="other"} 1
 	err := testutil.CollectAndCompare(c, strings.NewReader(want),
 		"tempest_udp_decode_errors_total", "tempest_udp_packets_total")
 	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestDerivedMetrics(t *testing.T) {
+	c, _ := newTestCollector(t)
+	loadSamples(t, c)
+	if n := testutil.CollectAndCount(c, "tempest_sea_level_pressure_pascals"); n != 0 {
+		t.Errorf("sea level pressure without elevation: got %d series, want 0", n)
+	}
+	// AIR and Tempest have temperature and humidity; SKY does not.
+	if n := testutil.CollectAndCount(c, "tempest_feels_like_celsius"); n != 2 {
+		t.Errorf("feels like series: got %d, want 2", n)
+	}
+
+	c.elevation = f(0)
+	want := `
+# HELP tempest_sea_level_pressure_pascals Station pressure reduced to sea level; only with --elevation.
+# TYPE tempest_sea_level_pressure_pascals gauge
+tempest_sea_level_pressure_pascals{serial="AR-00004049"} 83500
+tempest_sea_level_pressure_pascals{serial="ST-00000512"} 101757
+`
+	if err := testutil.CollectAndCompare(c, strings.NewReader(want), "tempest_sea_level_pressure_pascals"); err != nil {
 		t.Error(err)
 	}
 }

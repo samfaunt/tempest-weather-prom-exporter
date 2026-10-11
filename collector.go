@@ -24,6 +24,8 @@ var (
 	descLastObservation = newDesc("last_observation_timestamp_seconds", "Station timestamp of the latest observation.", "serial")
 	descTemperature     = newDesc("air_temperature_celsius", "Air temperature.", "serial")
 	descPressure        = newDesc("station_pressure_pascals", "Station (not sea level) pressure.", "serial")
+	descSeaLevelPress   = newDesc("sea_level_pressure_pascals", "Station pressure reduced to sea level; only with --elevation.", "serial")
+	descFeelsLike       = newDesc("feels_like_celsius", "Apparent temperature: heat index, wind chill or air temperature.", "serial")
 	descHumidity        = newDesc("relative_humidity_ratio", "Relative humidity (0-1).", "serial")
 	descWindLull        = newDesc("wind_lull_meters_per_second", "Minimum 3 second wind sample over the report interval.", "serial")
 	descWindAvg         = newDesc("wind_avg_meters_per_second", "Average wind speed over the report interval.", "serial")
@@ -125,6 +127,7 @@ type hubState struct {
 // staleAfter are dropped so dead stations do not report frozen values.
 type Collector struct {
 	staleAfter time.Duration
+	elevation  *float64 // meters above sea level; nil disables sea-level pressure
 	now        func() time.Time
 
 	mu      sync.Mutex
@@ -135,9 +138,10 @@ type Collector struct {
 	decodeErrors *prometheus.CounterVec
 }
 
-func NewCollector(staleAfter time.Duration) *Collector {
+func NewCollector(staleAfter time.Duration, elevation *float64) *Collector {
 	return &Collector{
 		staleAfter: staleAfter,
+		elevation:  elevation,
 		now:        time.Now,
 		devices:    map[string]*deviceState{},
 		hubs:       map[string]*hubState{},
@@ -266,7 +270,7 @@ func (c *Collector) Collect(ch chan<- prometheus.Metric) {
 			delete(c.devices, serial)
 			continue
 		}
-		d.collect(ch, serial)
+		d.collect(ch, serial, c.elevation)
 	}
 	for serial, h := range c.hubs {
 		if now.Sub(h.lastSeen) > c.staleAfter {
@@ -300,13 +304,17 @@ func bitSet(status, bit uint64) float64 {
 	return 0
 }
 
-func (d *deviceState) collect(ch chan<- prometheus.Metric, serial string) {
+func (d *deviceState) collect(ch chan<- prometheus.Metric, serial string, elevation *float64) {
 	ch <- prometheus.MustNewConstMetric(descDeviceInfo, prometheus.GaugeValue, 1, serial, d.hub, d.firmware)
 
 	if o := d.obs; o != nil {
 		gauge(ch, descLastObservation, o.time, serial)
 		gauge(ch, descTemperature, o.temperature, serial)
 		gauge(ch, descPressure, scaled(o.pressure, 100), serial)
+		if elevation != nil {
+			gauge(ch, descSeaLevelPress, scaled(seaLevelPressure(o.pressure, *elevation), 100), serial)
+		}
+		gauge(ch, descFeelsLike, feelsLike(o.temperature, o.humidity, o.windAvg), serial)
 		gauge(ch, descHumidity, scaled(o.humidity, 0.01), serial)
 		gauge(ch, descWindLull, o.windLull, serial)
 		gauge(ch, descWindAvg, o.windAvg, serial)

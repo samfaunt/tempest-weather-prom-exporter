@@ -111,9 +111,10 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
-        "w": 4,
+        "w": 3,
         "x": 0,
         "y": 1
       },
@@ -165,8 +166,140 @@
     },
     {
       "type": "stat",
-      "title": "Humidity",
+      "title": "Feels like",
       "id": 3,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_feels_like_celsius{serial=~\"$serial\"}",
+          "legendFormat": "{{serial}}",
+          "refId": "A"
+        }
+      ],
+      "description": "Heat index at or above 26.7 \u00b0C, wind chill at or below 10 \u00b0C with wind, otherwise air temperature.",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 3,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 10
+              },
+              {
+                "color": "orange",
+                "value": 27
+              },
+              {
+                "color": "red",
+                "value": 35
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Dew point",
+      "id": 4,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})))",
+          "legendFormat": "{{serial}}",
+          "refId": "A"
+        }
+      ],
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 6,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Humidity",
+      "id": 5,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -182,10 +315,11 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 9,
         "y": 1
       },
       "fieldConfig": {
@@ -225,7 +359,7 @@
     {
       "type": "stat",
       "title": "Pressure",
-      "id": 4,
+      "id": 6,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -241,10 +375,11 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 8,
+        "w": 3,
+        "x": 12,
         "y": 1
       },
       "fieldConfig": {
@@ -283,8 +418,69 @@
     },
     {
       "type": "stat",
+      "title": "Sea level",
+      "id": 7,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_sea_level_pressure_pascals{serial=~\"$serial\"} / 100",
+          "legendFormat": "{{serial}}",
+          "refId": "A"
+        }
+      ],
+      "description": "Pressure reduced to sea level. Requires the exporter's --elevation (TEMPEST_ELEVATION) setting.",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "pressurehpa",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 1,
+          "noValue": "set --elevation"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "type": "stat",
       "title": "Wind",
-      "id": 5,
+      "id": 8,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -309,10 +505,11 @@
           "refId": "B"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
-        "w": 4,
-        "x": 12,
+        "w": 3,
+        "x": 18,
         "y": 1
       },
       "fieldConfig": {
@@ -351,8 +548,68 @@
     },
     {
       "type": "stat",
+      "title": "Wind direction",
+      "id": 9,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_wind_direction_degrees{serial=~\"$serial\"}",
+          "legendFormat": "{{serial}}",
+          "refId": "A"
+        }
+      ],
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 1
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "degree",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "type": "stat",
       "title": "Rain (24h)",
-      "id": 6,
+      "id": 10,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -368,11 +625,12 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 16,
-        "y": 1
+        "x": 0,
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
@@ -414,8 +672,77 @@
     },
     {
       "type": "stat",
+      "title": "Precipitation",
+      "id": 11,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_precipitation_type{serial=~\"$serial\"} == 1",
+          "legendFormat": "{{type}}",
+          "refId": "A"
+        }
+      ],
+      "description": "",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 5
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "active"
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      }
+    },
+    {
+      "type": "stat",
       "title": "UV index",
-      "id": 7,
+      "id": 12,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -431,11 +758,12 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 20,
-        "y": 1
+        "x": 8,
+        "y": 5
       },
       "fieldConfig": {
         "defaults": {
@@ -489,126 +817,8 @@
     },
     {
       "type": "stat",
-      "title": "Dew point",
-      "id": 8,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})))",
-          "legendFormat": "{{serial}}",
-          "refId": "A"
-        }
-      ],
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 0,
-        "y": 5
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "celsius",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 1
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto",
-        "justifyMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
-      "type": "stat",
-      "title": "Wind direction",
-      "id": 9,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "tempest_wind_direction_degrees{serial=~\"$serial\"}",
-          "legendFormat": "{{serial}}",
-          "refId": "A"
-        }
-      ],
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 4,
-        "y": 5
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "degree",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "decimals": 0
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "value",
-        "graphMode": "area",
-        "textMode": "auto",
-        "justifyMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
-      "type": "stat",
       "title": "Solar radiation",
-      "id": 10,
+      "id": 13,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -624,10 +834,11 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 8,
+        "x": 12,
         "y": 5
       },
       "fieldConfig": {
@@ -667,7 +878,7 @@
     {
       "type": "stat",
       "title": "Illuminance",
-      "id": 11,
+      "id": 14,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -683,10 +894,11 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
         "w": 4,
-        "x": 12,
+        "x": 16,
         "y": 5
       },
       "fieldConfig": {
@@ -725,76 +937,8 @@
     },
     {
       "type": "stat",
-      "title": "Precipitation",
-      "id": 12,
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "expr": "tempest_precipitation_type{serial=~\"$serial\"} == 1",
-          "legendFormat": "{{type}}",
-          "refId": "A"
-        }
-      ],
-      "gridPos": {
-        "h": 4,
-        "w": 4,
-        "x": 16,
-        "y": 5
-      },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "none",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "text",
-                "value": null
-              }
-            ]
-          },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "1": {
-                  "text": "active"
-                }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "colorMode": "background",
-        "graphMode": "area",
-        "textMode": "auto",
-        "justifyMode": "auto",
-        "orientation": "auto"
-      }
-    },
-    {
-      "type": "stat",
       "title": "Lightning (1h)",
-      "id": 13,
+      "id": 15,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -810,6 +954,7 @@
           "refId": "A"
         }
       ],
+      "description": "",
       "gridPos": {
         "h": 4,
         "w": 4,
@@ -861,7 +1006,7 @@
     {
       "type": "row",
       "title": "Temperature & humidity",
-      "id": 14,
+      "id": 16,
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -873,8 +1018,8 @@
     },
     {
       "type": "timeseries",
-      "title": "Temperature & dew point",
-      "id": 15,
+      "title": "Temperature, feels like & dew point",
+      "id": 17,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -888,6 +1033,15 @@
           "expr": "tempest_air_temperature_celsius{serial=~\"$serial\"}",
           "legendFormat": "temperature {{serial}}",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_feels_like_celsius{serial=~\"$serial\"}",
+          "legendFormat": "feels like {{serial}}",
+          "refId": "C"
         },
         {
           "datasource": {
@@ -942,7 +1096,7 @@
     {
       "type": "timeseries",
       "title": "Relative humidity",
-      "id": 16,
+      "id": 18,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1001,8 +1155,8 @@
     },
     {
       "type": "timeseries",
-      "title": "Station pressure",
-      "id": 17,
+      "title": "Pressure",
+      "id": 19,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1014,8 +1168,17 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "expr": "tempest_station_pressure_pascals{serial=~\"$serial\"} / 100",
-          "legendFormat": "{{serial}}",
+          "legendFormat": "station {{serial}}",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "expr": "tempest_sea_level_pressure_pascals{serial=~\"$serial\"} / 100",
+          "legendFormat": "sea level {{serial}}",
+          "refId": "B"
         }
       ],
       "gridPos": {
@@ -1061,7 +1224,7 @@
     {
       "type": "timeseries",
       "title": "Pressure change (3h)",
-      "id": 18,
+      "id": 20,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1120,7 +1283,7 @@
     {
       "type": "row",
       "title": "Wind",
-      "id": 19,
+      "id": 21,
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -1133,7 +1296,7 @@
     {
       "type": "timeseries",
       "title": "Wind speed",
-      "id": 20,
+      "id": 22,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1219,7 +1382,7 @@
     {
       "type": "timeseries",
       "title": "Wind direction",
-      "id": 21,
+      "id": 23,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1288,7 +1451,7 @@
     {
       "type": "row",
       "title": "Rain",
-      "id": 22,
+      "id": 24,
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -1301,7 +1464,7 @@
     {
       "type": "timeseries",
       "title": "Rain per hour",
-      "id": 23,
+      "id": 25,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1361,7 +1524,7 @@
     {
       "type": "timeseries",
       "title": "Rain accumulation",
-      "id": 24,
+      "id": 26,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1429,7 +1592,7 @@
     {
       "type": "row",
       "title": "Sun",
-      "id": 25,
+      "id": 27,
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -1442,7 +1605,7 @@
     {
       "type": "timeseries",
       "title": "Solar radiation & illuminance",
-      "id": 26,
+      "id": 28,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1526,7 +1689,7 @@
     {
       "type": "timeseries",
       "title": "UV index",
-      "id": 27,
+      "id": 29,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1586,7 +1749,7 @@
     {
       "type": "row",
       "title": "Lightning",
-      "id": 28,
+      "id": 30,
       "collapsed": false,
       "gridPos": {
         "h": 1,
@@ -1599,7 +1762,7 @@
     {
       "type": "timeseries",
       "title": "Strikes per 5m",
-      "id": 29,
+      "id": 31,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1659,7 +1822,7 @@
     {
       "type": "timeseries",
       "title": "Strike distance",
-      "id": 30,
+      "id": 32,
       "datasource": {
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
@@ -1727,7 +1890,7 @@
     {
       "type": "row",
       "title": "Device health",
-      "id": 36,
+      "id": 38,
       "collapsed": true,
       "gridPos": {
         "h": 1,
@@ -1739,7 +1902,7 @@
         {
           "type": "timeseries",
           "title": "Battery",
-          "id": 31,
+          "id": 33,
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
@@ -1798,7 +1961,7 @@
         {
           "type": "timeseries",
           "title": "Signal strength",
-          "id": 32,
+          "id": 34,
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
@@ -1874,7 +2037,7 @@
         {
           "type": "timeseries",
           "title": "Uptime",
-          "id": 33,
+          "id": 35,
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
@@ -1941,7 +2104,7 @@
         {
           "type": "table",
           "title": "Sensor & power flags",
-          "id": 34,
+          "id": 36,
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
@@ -2028,7 +2191,7 @@
         {
           "type": "timeseries",
           "title": "Exporter packets/s",
-          "id": 35,
+          "id": 37,
           "datasource": {
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
