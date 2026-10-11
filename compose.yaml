@@ -1,0 +1,6 @@
+services:
+  tempest-exporter:
+    build: .
+    # Hub broadcasts do not cross Docker's bridge network.
+    network_mode: host
+    restart: unless-stopped
