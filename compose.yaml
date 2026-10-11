@@ -1,6 +1,6 @@
 services:
   tempest-exporter:
-    build: .
+    image: ghcr.io/samfaunt/tempest-weather-prom-exporter:latest
     # Hub broadcasts do not cross Docker's bridge network.
     network_mode: host
     restart: unless-stopped

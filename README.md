@@ -13,8 +13,9 @@ docker run -d --name tempest-exporter --network host --restart unless-stopped \
 curl localhost:7070/metrics
 ```
 
-Or build locally with `docker compose up -d --build`. Images for `linux/amd64`
-and `linux/arm64` are published on pushes to `main` (`latest`) and `v*` tags.
+Or with Compose: `docker compose up -d`. Images for `linux/amd64` and
+`linux/arm64` are published on pushes to `main` (`latest`) and `v*` tags. To
+build locally instead: `docker build -t tempest-exporter .`
 
 The container must use `network_mode: host`; the hub's broadcasts do not reach
 containers on Docker's bridge network. Allow inbound UDP 50222 in the host
@@ -78,6 +79,14 @@ except rain, which stays in millimeters.
 
 Dew point, feels-like and sea-level pressure are not computed; derive them with
 recording rules or in Grafana.
+
+## Grafana
+
+Import `grafana/tempest-dashboard.json` (Dashboards → New → Import) and pick
+your Prometheus data source. It has current conditions, temperature and dew
+point, humidity, pressure and 3h pressure change, wind, rain, sun, lightning,
+and a collapsed device health row (battery, signal, uptime, sensor flags,
+exporter packet rate). The Station selector filters by device serial.
 
 ### PromQL recipes
 
