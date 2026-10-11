@@ -93,10 +93,25 @@ import form asks for:
 - **Station serial**: your Tempest serial (e.g. `ST-00012345`), or a regex;
   the default `.+` shows all stations.
 
-Both are fixed at import; re-import to change them. The dashboard has current
-conditions, temperature with feels-like and dew point, humidity, station and sea-level
-pressure, 3h pressure change, wind, rain, sun, lightning, and a collapsed device health row
-(battery, signal, uptime, sensor flags, exporter packet rate).
+Both are fixed at import (the serial is written into each query, so the
+dashboard has no variables); re-import with overwrite to change them. The
+dashboard has current conditions, temperature with feels-like and dew point,
+humidity, station and sea-level pressure, 3h pressure change, wind (km/h),
+rain, sun, lightning, and a collapsed device health row (battery, signal,
+uptime, sensor flags, exporter packet rate).
+
+### Sharing externally
+
+The dashboard works with Grafana's externally shared dashboards (Grafana 11+;
+needs Admin or the `dashboards.public:write` permission):
+
+1. Open the dashboard → **Share** → **Share externally**.
+2. Choose **Anyone with the link**, accept the notice, and optionally enable
+   time range picking.
+3. Copy the link. Viewers need no Grafana account and get a read-only view.
+
+Anyone with the link can see your station data and its serial. Revoke it under
+**Dashboards → Shared dashboards**.
 
 ### PromQL recipes
 

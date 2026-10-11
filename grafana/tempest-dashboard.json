@@ -41,26 +41,7 @@
     "to": "now"
   },
   "templating": {
-    "list": [
-      {
-        "name": "serial",
-        "label": "Station",
-        "type": "constant",
-        "query": "${VAR_SERIAL}",
-        "hide": 2,
-        "current": {
-          "value": "${VAR_SERIAL}",
-          "text": "${VAR_SERIAL}"
-        },
-        "options": [
-          {
-            "value": "${VAR_SERIAL}",
-            "text": "${VAR_SERIAL}",
-            "selected": true
-          }
-        ]
-      }
-    ]
+    "list": []
   },
   "annotations": {
     "list": [
@@ -106,7 +87,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_air_temperature_celsius{serial=~\"$serial\"}",
+          "expr": "tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -178,7 +159,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_feels_like_celsius{serial=~\"$serial\"}",
+          "expr": "tempest_feels_like_celsius{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -250,7 +231,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})))",
+          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"})))",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -310,7 +291,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_relative_humidity_ratio{serial=~\"$serial\"}",
+          "expr": "tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -370,7 +351,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_station_pressure_pascals{serial=~\"$serial\"} / 100",
+          "expr": "tempest_station_pressure_pascals{serial=~\"${VAR_SERIAL}\"} / 100",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -430,7 +411,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_sea_level_pressure_pascals{serial=~\"$serial\"} / 100",
+          "expr": "tempest_sea_level_pressure_pascals{serial=~\"${VAR_SERIAL}\"} / 100",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -491,7 +472,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_wind_avg_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "avg {{serial}}",
           "refId": "A"
         },
@@ -500,7 +481,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_wind_gust_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "gust {{serial}}",
           "refId": "B"
         }
@@ -560,7 +541,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_direction_degrees{serial=~\"$serial\"}",
+          "expr": "tempest_wind_direction_degrees{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -620,7 +601,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "increase(tempest_rain_millimeters_total{serial=~\"$serial\"}[24h])",
+          "expr": "increase(tempest_rain_millimeters_total{serial=~\"${VAR_SERIAL}\"}[24h])",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -684,8 +665,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_precipitation_type{serial=~\"$serial\"} == 1",
-          "legendFormat": "{{type}}",
+          "expr": "sum by (serial) (tempest_precipitation_type{serial=~\"${VAR_SERIAL}\",type=\"rain\"}) + 2 * sum by (serial) (tempest_precipitation_type{serial=~\"${VAR_SERIAL}\",type=\"hail\"}) + 3 * sum by (serial) (tempest_precipitation_type{serial=~\"${VAR_SERIAL}\",type=\"rain_hail\"})",
+          "legendFormat": "{{serial}}",
           "refId": "A"
         }
       ],
@@ -715,8 +696,24 @@
             {
               "type": "value",
               "options": {
+                "0": {
+                  "text": "None",
+                  "index": 0
+                },
                 "1": {
-                  "text": "active"
+                  "text": "Rain",
+                  "color": "blue",
+                  "index": 1
+                },
+                "2": {
+                  "text": "Hail",
+                  "color": "purple",
+                  "index": 2
+                },
+                "3": {
+                  "text": "Rain + hail",
+                  "color": "purple",
+                  "index": 3
                 }
               }
             }
@@ -732,7 +729,7 @@
           "fields": "",
           "values": false
         },
-        "colorMode": "background",
+        "colorMode": "value",
         "graphMode": "area",
         "textMode": "auto",
         "justifyMode": "auto",
@@ -753,7 +750,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_uv_index{serial=~\"$serial\"}",
+          "expr": "tempest_uv_index{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -829,7 +826,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_solar_radiation_watts_per_square_meter{serial=~\"$serial\"}",
+          "expr": "tempest_solar_radiation_watts_per_square_meter{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -889,7 +886,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_illuminance_lux{serial=~\"$serial\"}",
+          "expr": "tempest_illuminance_lux{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -949,7 +946,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "increase(tempest_lightning_strikes_total{serial=~\"$serial\"}[1h])",
+          "expr": "increase(tempest_lightning_strikes_total{serial=~\"${VAR_SERIAL}\"}[1h])",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -1030,7 +1027,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_air_temperature_celsius{serial=~\"$serial\"}",
+          "expr": "tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "temperature {{serial}}",
           "refId": "A"
         },
@@ -1039,7 +1036,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_feels_like_celsius{serial=~\"$serial\"}",
+          "expr": "tempest_feels_like_celsius{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "feels like {{serial}}",
           "refId": "C"
         },
@@ -1048,7 +1045,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"$serial\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"$serial\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"$serial\"})))",
+          "expr": "243.12 * (ln(tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"})) / (17.62 - (ln(tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}) + 17.62 * tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"} / (243.12 + tempest_air_temperature_celsius{serial=~\"${VAR_SERIAL}\"})))",
           "legendFormat": "dew point {{serial}}",
           "refId": "B"
         }
@@ -1107,7 +1104,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_relative_humidity_ratio{serial=~\"$serial\"}",
+          "expr": "tempest_relative_humidity_ratio{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -1167,7 +1164,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_station_pressure_pascals{serial=~\"$serial\"} / 100",
+          "expr": "tempest_station_pressure_pascals{serial=~\"${VAR_SERIAL}\"} / 100",
           "legendFormat": "station {{serial}}",
           "refId": "A"
         },
@@ -1176,7 +1173,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_sea_level_pressure_pascals{serial=~\"$serial\"} / 100",
+          "expr": "tempest_sea_level_pressure_pascals{serial=~\"${VAR_SERIAL}\"} / 100",
           "legendFormat": "sea level {{serial}}",
           "refId": "B"
         }
@@ -1235,7 +1232,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "delta(tempest_station_pressure_pascals{serial=~\"$serial\"}[3h]) / 100",
+          "expr": "delta(tempest_station_pressure_pascals{serial=~\"${VAR_SERIAL}\"}[3h]) / 100",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -1307,7 +1304,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_lull_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_wind_lull_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "lull {{serial}}",
           "refId": "A"
         },
@@ -1316,7 +1313,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_wind_avg_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "avg {{serial}}",
           "refId": "B"
         },
@@ -1325,7 +1322,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_wind_gust_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "gust {{serial}}",
           "refId": "C"
         },
@@ -1334,7 +1331,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_rapid_wind_speed_meters_per_second{serial=~\"$serial\"} * 3.6",
+          "expr": "tempest_rapid_wind_speed_meters_per_second{serial=~\"${VAR_SERIAL}\"} * 3.6",
           "legendFormat": "rapid {{serial}}",
           "refId": "D"
         }
@@ -1393,7 +1390,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_direction_degrees{serial=~\"$serial\"}",
+          "expr": "tempest_wind_direction_degrees{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "avg {{serial}}",
           "refId": "A"
         },
@@ -1402,7 +1399,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_rapid_wind_direction_degrees{serial=~\"$serial\"}",
+          "expr": "tempest_rapid_wind_direction_degrees{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "rapid {{serial}}",
           "refId": "B"
         }
@@ -1475,7 +1472,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "increase(tempest_rain_millimeters_total{serial=~\"$serial\"}[1h])",
+          "expr": "increase(tempest_rain_millimeters_total{serial=~\"${VAR_SERIAL}\"}[1h])",
           "legendFormat": "{{serial}}",
           "refId": "A",
           "interval": "1h"
@@ -1535,7 +1532,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "increase(tempest_rain_millimeters_total{serial=~\"$serial\"}[24h])",
+          "expr": "increase(tempest_rain_millimeters_total{serial=~\"${VAR_SERIAL}\"}[24h])",
           "legendFormat": "rolling 24h {{serial}}",
           "refId": "A"
         },
@@ -1544,7 +1541,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_rain_day_millimeters{serial=~\"$serial\"}",
+          "expr": "tempest_rain_day_millimeters{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "day (SKY) {{serial}}",
           "refId": "B"
         }
@@ -1616,7 +1613,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_solar_radiation_watts_per_square_meter{serial=~\"$serial\"}",
+          "expr": "tempest_solar_radiation_watts_per_square_meter{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "solar {{serial}}",
           "refId": "A"
         },
@@ -1625,7 +1622,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_illuminance_lux{serial=~\"$serial\"}",
+          "expr": "tempest_illuminance_lux{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "illuminance {{serial}}",
           "refId": "B"
         }
@@ -1700,7 +1697,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_uv_index{serial=~\"$serial\"}",
+          "expr": "tempest_uv_index{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "{{serial}}",
           "refId": "A"
         }
@@ -1773,7 +1770,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "increase(tempest_lightning_strikes_total{serial=~\"$serial\"}[5m])",
+          "expr": "increase(tempest_lightning_strikes_total{serial=~\"${VAR_SERIAL}\"}[5m])",
           "legendFormat": "{{serial}}",
           "refId": "A",
           "interval": "5m"
@@ -1833,7 +1830,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_lightning_strike_avg_distance_meters{serial=~\"$serial\"}",
+          "expr": "tempest_lightning_strike_avg_distance_meters{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "avg {{serial}}",
           "refId": "A"
         },
@@ -1842,7 +1839,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_lightning_last_strike_distance_meters{serial=~\"$serial\"}",
+          "expr": "tempest_lightning_last_strike_distance_meters{serial=~\"${VAR_SERIAL}\"}",
           "legendFormat": "last event {{serial}}",
           "refId": "B"
         }
@@ -1913,7 +1910,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_battery_volts{serial=~\"$serial\"}",
+              "expr": "tempest_battery_volts{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "{{serial}}",
               "refId": "A"
             }
@@ -1972,7 +1969,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_device_rssi_dbm{serial=~\"$serial\"}",
+              "expr": "tempest_device_rssi_dbm{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "device {{serial}}",
               "refId": "A"
             },
@@ -1981,7 +1978,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_device_hub_rssi_dbm{serial=~\"$serial\"}",
+              "expr": "tempest_device_hub_rssi_dbm{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "hub seen by {{serial}}",
               "refId": "B"
             },
@@ -2048,7 +2045,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_device_uptime_seconds{serial=~\"$serial\"}",
+              "expr": "tempest_device_uptime_seconds{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "{{serial}}",
               "refId": "A"
             },
@@ -2121,7 +2118,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_sensor_failed{serial=~\"$serial\"}",
+              "expr": "tempest_sensor_failed{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "",
               "refId": "A",
               "format": "table",
@@ -2132,7 +2129,7 @@
                 "type": "prometheus",
                 "uid": "${DS_PROMETHEUS}"
               },
-              "expr": "tempest_power_booster{serial=~\"$serial\"}",
+              "expr": "tempest_power_booster{serial=~\"${VAR_SERIAL}\"}",
               "legendFormat": "",
               "refId": "B",
               "format": "table",
