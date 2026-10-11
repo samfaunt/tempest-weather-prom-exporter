@@ -86,19 +86,27 @@ Dew point is computed in the Grafana dashboard from temperature and humidity.
 
 ## Grafana
 
-Import `grafana/tempest-dashboard.json` (Dashboards → New → Import). The
-import form asks for:
+Import the dashboard with `grafana/import.sh` (needs `curl` and `jq`, and a
+Grafana service account token with the Editor role):
 
-- **Prometheus**: the data source scraping the exporter.
-- **Station serial**: your Tempest serial (e.g. `ST-00012345`), or a regex;
-  the default `.+` shows all stations.
+```sh
+GRAFANA_URL=https://grafana.example.com GRAFANA_TOKEN=glsa_... \
+  grafana/import.sh "Prometheus" ST-00012345
+```
 
-Both are fixed at import (the serial is written into each query, so the
-dashboard has no variables); re-import with overwrite to change them. The
-dashboard has current conditions, temperature with feels-like and dew point,
-humidity, station and sea-level pressure, 3h pressure change, wind (km/h),
-rain, sun, lightning, and a collapsed device health row (battery, signal,
-uptime, sensor flags, exporter packet rate).
+The first argument is the name of the Prometheus data source scraping the
+exporter; the second is your station serial (default `.+`, all stations).
+Re-run it to change either; it overwrites the dashboard.
+
+Use the script rather than Grafana's web import page. The page fills in the
+data source but not the station serial, so every panel shows No data. The
+script uses Grafana's import API, which writes the serial into each query, so
+the dashboard has no variables and can be shared externally.
+
+The dashboard has current conditions, temperature with feels-like and dew
+point, humidity, station and sea-level pressure, 3h pressure change, wind
+(km/h), rain, sun, lightning, and a collapsed device health row (battery,
+signal, uptime, sensor flags, exporter packet rate).
 
 ### Sharing externally
 

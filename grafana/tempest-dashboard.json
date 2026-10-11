@@ -13,7 +13,7 @@
       "label": "Station serial",
       "type": "constant",
       "value": ".+",
-      "description": "Tempest serial (e.g. ST-00012345), or a regex such as .+ for all stations"
+      "description": "Only applied by grafana/import.sh; Grafana's web import page leaves it unset and panels show No data"
     }
   ],
   "__requires": [
