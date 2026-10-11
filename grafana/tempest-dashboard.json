@@ -1839,8 +1839,8 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_lightning_last_strike_distance_meters{serial=~\"${VAR_SERIAL}\"}",
-          "legendFormat": "last event {{serial}}",
+          "expr": "tempest_lightning_last_strike_distance_meters{serial=~\"${VAR_SERIAL}\"} and on (serial) changes(tempest_lightning_last_strike_timestamp_seconds{serial=~\"${VAR_SERIAL}\"}[5m]) > 0",
+          "legendFormat": "last strike {{serial}}",
           "refId": "B"
         }
       ],
