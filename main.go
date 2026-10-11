@@ -50,16 +50,18 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		w.Write([]byte(`<html><body><h1>Tempest exporter</h1><a href="/metrics">Metrics</a></body></html>`))
+		_, _ = w.Write([]byte(`<html><body><h1>Tempest exporter</h1><a href="/metrics">Metrics</a></body></html>`))
 	})
 	srv := &http.Server{Addr: *listenAddr, Handler: mux, ReadHeaderTimeout: 10 * time.Second}
 
 	go func() {
 		<-ctx.Done()
-		conn.Close()
+		_ = conn.Close()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		srv.Shutdown(shutdownCtx)
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			slog.Error("http shutdown", "err", err)
+		}
 	}()
 
 	slog.Info("listening", "http", *listenAddr, "udp", *udpAddr, "stale_after", *staleAfter)
@@ -75,9 +77,10 @@ func listenUDP(ctx context.Context, addr string) (net.PacketConn, error) {
 	lc := net.ListenConfig{Control: func(_, _ string, rc syscall.RawConn) error {
 		var sockErr error
 		err := rc.Control(func(fd uintptr) {
-			sockErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
+			s := int(fd) // #nosec G115 -- file descriptors always fit in int
+			sockErr = unix.SetsockoptInt(s, unix.SOL_SOCKET, unix.SO_REUSEADDR, 1)
 			if sockErr == nil {
-				sockErr = unix.SetsockoptInt(int(fd), unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
+				sockErr = unix.SetsockoptInt(s, unix.SOL_SOCKET, unix.SO_REUSEPORT, 1)
 			}
 		})
 		if err != nil {
