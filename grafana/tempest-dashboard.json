@@ -491,7 +491,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "avg {{serial}}",
           "refId": "A"
         },
@@ -500,7 +500,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "gust {{serial}}",
           "refId": "B"
         }
@@ -514,7 +514,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "velocityms",
+          "unit": "velocitykmh",
           "color": {
             "mode": "thresholds"
           },
@@ -1307,7 +1307,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_lull_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_wind_lull_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "lull {{serial}}",
           "refId": "A"
         },
@@ -1316,7 +1316,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_wind_avg_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "avg {{serial}}",
           "refId": "B"
         },
@@ -1325,7 +1325,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_wind_gust_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "gust {{serial}}",
           "refId": "C"
         },
@@ -1334,7 +1334,7 @@
             "type": "prometheus",
             "uid": "${DS_PROMETHEUS}"
           },
-          "expr": "tempest_rapid_wind_speed_meters_per_second{serial=~\"$serial\"}",
+          "expr": "tempest_rapid_wind_speed_meters_per_second{serial=~\"$serial\"} * 3.6",
           "legendFormat": "rapid {{serial}}",
           "refId": "D"
         }
@@ -1347,7 +1347,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "velocityms",
+          "unit": "velocitykmh",
           "custom": {
             "drawStyle": "line",
             "lineWidth": 1,
