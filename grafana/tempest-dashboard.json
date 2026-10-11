@@ -7,6 +7,13 @@
       "type": "datasource",
       "pluginId": "prometheus",
       "pluginName": "Prometheus"
+    },
+    {
+      "name": "VAR_SERIAL",
+      "label": "Station serial",
+      "type": "constant",
+      "value": ".+",
+      "description": "Tempest serial (e.g. ST-00012345), or a regex such as .+ for all stations"
     }
   ],
   "__requires": [
@@ -38,23 +45,20 @@
       {
         "name": "serial",
         "label": "Station",
-        "type": "query",
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
+        "type": "constant",
+        "query": "${VAR_SERIAL}",
+        "hide": 2,
+        "current": {
+          "value": "${VAR_SERIAL}",
+          "text": "${VAR_SERIAL}"
         },
-        "query": {
-          "query": "label_values(tempest_device_info, serial)",
-          "refId": "serial"
-        },
-        "definition": "label_values(tempest_device_info, serial)",
-        "refresh": 2,
-        "multi": true,
-        "includeAll": true,
-        "allValue": ".+",
-        "current": {},
-        "sort": 1,
-        "hide": 0
+        "options": [
+          {
+            "value": "${VAR_SERIAL}",
+            "text": "${VAR_SERIAL}",
+            "selected": true
+          }
+        ]
       }
     ]
   },

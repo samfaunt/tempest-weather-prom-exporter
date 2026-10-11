@@ -82,11 +82,17 @@ recording rules or in Grafana.
 
 ## Grafana
 
-Import `grafana/tempest-dashboard.json` (Dashboards → New → Import) and choose
-your Prometheus data source in the import form. It has current conditions, temperature and dew
-point, humidity, pressure and 3h pressure change, wind, rain, sun, lightning,
-and a collapsed device health row (battery, signal, uptime, sensor flags,
-exporter packet rate). The Station selector filters by device serial.
+Import `grafana/tempest-dashboard.json` (Dashboards → New → Import). The
+import form asks for:
+
+- **Prometheus**: the data source scraping the exporter.
+- **Station serial**: your Tempest serial (e.g. `ST-00012345`), or a regex;
+  the default `.+` shows all stations.
+
+Both are fixed at import; re-import to change them. The dashboard has current
+conditions, temperature and dew point, humidity, pressure and 3h pressure
+change, wind, rain, sun, lightning, and a collapsed device health row
+(battery, signal, uptime, sensor flags, exporter packet rate).
 
 ### PromQL recipes
 
