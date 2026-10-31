@@ -14,8 +14,8 @@ jobs:
       contents: read
       security-events: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: securego/gosec@v2.29.0
+      - uses: actions/checkout@v7
+      - uses: securego/gosec@v2.30.0
         with:
           args: -fmt sarif -out results.sarif ./...
       # Upload even when gosec fails so findings show in code scanning.
